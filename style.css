@@ -1,0 +1,847 @@
+/* ═══════════════════════════════════════════════════
+   BIRTHDAY SURPRISE — style.css
+   Cinematic scroll experience
+   ═══════════════════════════════════════════════════ */
+
+/* ─── CSS CUSTOM PROPERTIES ─── */
+:root {
+  --cream:     #f5ede0;
+  --ivory:     #fdf6ec;
+  --gold:      #c9a96e;
+  --gold-pale: #e8d5b0;
+  --blush:     #e8b4b8;
+  --rose:      #c97d87;
+  --deep:      #1a1015;
+  --midnight:  #0d0a10;
+  --slate:     #2e2535;
+  --warm-gray: #7a6e6b;
+  --text-main: #f0e6d8;
+  --text-soft: rgba(240, 230, 216, 0.65);
+
+  --ff-display: 'Cinzel Decorative', serif;
+  --ff-serif:   'Cinzel', serif;
+  --ff-body:    'Cormorant Garamond', serif;
+
+  --transition-base: 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-slow: 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── RESET ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  background: var(--midnight);
+  color: var(--text-main);
+  font-family: var(--ff-body);
+  font-weight: 300;
+  line-height: 1.7;
+  overflow: hidden; /* gate locks scroll */
+  cursor: default;
+}
+
+/* When gate is dismissed body becomes scrollable */
+body.unlocked { overflow: hidden; } /* scroll happens on #scrollContainer */
+
+/* ═══════════════════════════════════════════════════
+   GATE OVERLAY
+═══════════════════════════════════════════════════ */
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--midnight);
+  transition: opacity 1.4s ease, visibility 1.4s ease;
+}
+
+.gate.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#gateCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.gate-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, rgba(201,169,110,0.12) 0%, transparent 70%);
+  animation: gateGlowPulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes gateGlowPulse {
+  0%, 100% { opacity: 0.5; transform: translate(-50%,-50%) scale(1); }
+  50%       { opacity: 1;   transform: translate(-50%,-50%) scale(1.1); }
+}
+
+.gate-inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 2rem;
+}
+
+.gate-eyebrow {
+  font-family: var(--ff-serif);
+  font-size: clamp(0.65rem, 1.5vw, 0.8rem);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.8rem;
+  opacity: 0;
+  animation: fadeSlideUp 1s 0.4s forwards;
+}
+
+.gate-title {
+  font-family: var(--ff-display);
+  font-size: clamp(3rem, 8vw, 7rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--cream);
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: fadeSlideUp 1s 0.7s forwards;
+}
+
+.gate-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.gate-sub {
+  font-family: var(--ff-body);
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  color: var(--text-soft);
+  margin-bottom: 3rem;
+  opacity: 0;
+  animation: fadeSlideUp 1s 1s forwards;
+}
+
+/* ─── Start Button ─── */
+.start-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: transparent;
+  border: 1px solid rgba(201,169,110,0.5);
+  color: var(--gold);
+  font-family: var(--ff-serif);
+  font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 1.1rem 2.8rem;
+  cursor: pointer;
+  transition: background var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+  opacity: 0;
+  animation: fadeSlideUp 1s 1.3s forwards;
+}
+
+.start-btn:hover {
+  background: rgba(201,169,110,0.12);
+  border-color: var(--gold);
+  color: var(--cream);
+}
+
+.btn-ring {
+  position: absolute;
+  inset: -8px;
+  border: 1px solid rgba(201,169,110,0.2);
+  transition: opacity 0.4s;
+}
+
+.start-btn:hover .btn-ring { opacity: 0; }
+
+/* ═══════════════════════════════════════════════════
+   PROGRESS BAR
+═══════════════════════════════════════════════════ */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--gold), var(--blush));
+  z-index: 500;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px rgba(201,169,110,0.6);
+}
+
+/* ═══════════════════════════════════════════════════
+   SECTION DOTS NAV
+═══════════════════════════════════════════════════ */
+.section-dots {
+  position: fixed;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,0.5);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.4s, transform 0.4s, border-color 0.4s;
+  padding: 0;
+}
+
+.dot.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  transform: scale(1.4);
+}
+
+/* ═══════════════════════════════════════════════════
+   SCROLL CONTAINER
+═══════════════════════════════════════════════════ */
+.scroll-container {
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
+  /* Hide scrollbar cross-browser */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-container::-webkit-scrollbar { display: none; }
+
+/* Gate lock */
+.scroll-container.locked {
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════
+   SCENE (SECTION) BASE
+═══════════════════════════════════════════════════ */
+.scene {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  overflow: hidden;
+}
+
+/* Background image layer */
+.scene-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: scale(1.06);
+  transition: transform 12s ease;
+  will-change: transform;
+}
+
+.scene.in-view .scene-bg { transform: scale(1); }
+
+/* Dark overlay — each scene has its own tint */
+.scene-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Section number watermark */
+.scene-number {
+  position: absolute;
+  bottom: 3rem;
+  left: 3rem;
+  font-family: var(--ff-serif);
+  font-size: clamp(4rem, 10vw, 9rem);
+  font-weight: 600;
+  color: rgba(255,255,255,0.04);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Scene content wrapper */
+.scene-content {
+  position: relative;
+  z-index: 10;
+  width: min(90%, 1100px);
+  padding: 2rem;
+}
+
+.scene-content.text-center { text-align: center; }
+.scene-content.text-right  { text-align: right; }
+
+/* layout-split removed — replaced by .layout-duo (see portrait duo section below) */
+
+/* ─── Typography ─── */
+.eyebrow {
+  font-family: var(--ff-serif);
+  font-size: clamp(0.6rem, 1.4vw, 0.75rem);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.2rem;
+}
+
+.scene-title {
+  font-family: var(--ff-display);
+  font-size: clamp(2.4rem, 5.5vw, 5.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  color: var(--cream);
+  margin-bottom: 1.8rem;
+}
+
+.scene-title em {
+  font-style: italic;
+  color: var(--gold-pale);
+  display: block;
+}
+
+.scene-body {
+  font-family: var(--ff-body);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  font-weight: 300;
+  color: var(--text-soft);
+  line-height: 1.85;
+  max-width: 560px;
+}
+
+.scene-content.text-center .scene-body { margin: 0 auto; }
+
+.scene-body-large {
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  line-height: 1.9;
+}
+
+.divider {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  margin-top: 2.5rem;
+}
+
+.scene-content.text-center .divider { margin-left: auto; margin-right: auto; }
+
+/* ═══════════════════════════════════════════════════
+   SECTION OVERLAYS (unique per scene)
+═══════════════════════════════════════════════════ */
+.s1-overlay {
+  background: linear-gradient(
+    160deg,
+    rgba(13,10,16,0.72) 0%,
+    rgba(30,18,35,0.55) 50%,
+    rgba(13,10,16,0.80) 100%
+  );
+}
+
+.s2-overlay {
+  background: linear-gradient(
+    140deg,
+    rgba(20,12,10,0.75) 0%,
+    rgba(40,25,18,0.55) 60%,
+    rgba(20,12,10,0.80) 100%
+  );
+}
+
+.s3-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(10,10,20,0.65) 0%,
+    rgba(20,15,35,0.50) 50%,
+    rgba(10,10,20,0.80) 100%
+  );
+}
+
+.s4-overlay {
+  background: radial-gradient(ellipse at center,
+    rgba(18,10,22,0.50) 0%,
+    rgba(10,6,14,0.88) 100%
+  );
+}
+
+.s5-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(10,6,14,0.60) 0%,
+    rgba(20,10,20,0.45) 40%,
+    rgba(10,6,14,0.85) 100%
+  );
+}
+
+/* ═══════════════════════════════════════════════════
+   SECTION 1 — PARTICLES & ORBS
+═══════════════════════════════════════════════════ */
+.particle-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  animation: orbFloat 8s ease-in-out infinite;
+}
+
+.orb-a {
+  width: clamp(200px, 30vw, 400px);
+  height: clamp(200px, 30vw, 400px);
+  background: rgba(201,169,110,0.08);
+  top: 10%;
+  right: 5%;
+  animation-delay: 0s;
+}
+
+.orb-b {
+  width: clamp(150px, 20vw, 300px);
+  height: clamp(150px, 20vw, 300px);
+  background: rgba(201,125,135,0.07);
+  bottom: 15%;
+  left: 8%;
+  animation-delay: 2.5s;
+}
+
+.orb-c {
+  width: clamp(100px, 15vw, 200px);
+  height: clamp(100px, 15vw, 200px);
+  background: rgba(180,140,210,0.06);
+  top: 40%;
+  left: 30%;
+  animation-delay: 5s;
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-30px) scale(1.05); }
+}
+
+/* ═══════════════════════════════════════════════════
+   PORTRAIT DUO LAYOUT — shared across all 5 sections
+═══════════════════════════════════════════════════ */
+
+/* Two-column: text left, images right (default) */
+.layout-duo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 4vw, 5rem);
+  align-items: center;
+}
+
+/* Reversed: images left, text right */
+.layout-duo--reverse {
+  direction: rtl; /* flip column order */
+}
+.layout-duo--reverse > * {
+  direction: ltr; /* reset content direction */
+}
+
+/* ── Duo wrapper: positions the two portrait cards ── */
+.duo-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;  /* stack + slight right offset for top card */
+  gap: 0;                 /* overlap handled via margin */
+  height: clamp(340px, 68vh, 580px);
+  pointer-events: none;   /* prevent accidental scroll lock on drag */
+}
+
+/* ── Individual portrait card ── */
+.portrait-card {
+  width: clamp(130px, 22vw, 210px);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow:
+    0 16px 48px rgba(0,0,0,0.55),
+    0 4px 16px rgba(0,0,0,0.35),
+    0 0 0 1px rgba(255,255,255,0.06);
+  flex-shrink: 0;
+  pointer-events: auto;
+}
+
+.portrait-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top; /* favour faces at top of portrait */
+  display: block;
+  /* Soft vignette + film grain feel */
+  filter: brightness(0.93) contrast(1.04) saturate(0.9);
+  transition: filter 0.6s ease, transform 0.6s ease;
+}
+
+.portrait-card:hover img {
+  filter: brightness(1) contrast(1.02) saturate(1);
+  transform: scale(1.02);
+}
+
+/* Top card: taller, positioned at top, slight left rotation */
+.portrait-card--top {
+  height: clamp(200px, 40vh, 360px);
+  align-self: flex-start;
+  transform: rotate(-2deg) translateX(-10px);
+  transform-origin: bottom center;
+  z-index: 2;
+  margin-bottom: -60px; /* overlap with bottom card */
+}
+
+/* Bottom card: slightly shorter, offset right, slight right rotation */
+.portrait-card--btm {
+  height: clamp(170px, 34vh, 300px);
+  align-self: flex-end;
+  transform: rotate(2.5deg) translateX(10px);
+  transform-origin: top center;
+  z-index: 1;
+}
+
+/* ── Portrait reveal animations ── */
+.reveal-portrait {
+  opacity: 0;
+  transition:
+    opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Top card slides in from left */
+.portrait-card--top.reveal-portrait {
+  transform: rotate(-2deg) translateX(-10px) translateX(-40px) translateY(20px);
+}
+
+/* Bottom card slides in from right, slightly later */
+.portrait-card--btm.reveal-portrait {
+  transform: rotate(2.5deg) translateX(10px) translateX(40px) translateY(20px);
+}
+
+/* Revealed — IntersectionObserver adds .in-view to parent .scene */
+.in-view .portrait-card--top.reveal-portrait {
+  opacity: 1;
+  transform: rotate(-2deg) translateX(-10px);
+}
+
+.in-view .portrait-card--btm.reveal-portrait {
+  opacity: 1;
+  transform: rotate(2.5deg) translateX(10px);
+}
+
+/* ═══════════════════════════════════════════════════
+   SECTION 3 — CHAOS
+═══════════════════════════════════════════════════ */
+.scene-title-chaos { color: var(--cream); }
+
+.chaos-words {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cw {
+  position: absolute;
+  font-family: var(--ff-body);
+  font-style: italic;
+  color: rgba(255,255,255,0.04);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.cw-1 { font-size: clamp(3rem,8vw,8rem);  top: 8%;  left: -2%;  animation: cwDrift 10s ease-in-out infinite; }
+.cw-2 { font-size: clamp(2rem,5vw,6rem);  top: 70%; right: 2%;  animation: cwDrift 8s  ease-in-out infinite 1s; }
+.cw-3 { font-size: clamp(1.5rem,4vw,5rem);top: 35%; left: 60%;  animation: cwDrift 12s ease-in-out infinite 2s; }
+.cw-4 { font-size: clamp(4rem,10vw,11rem);bottom: 5%;left: 25%; animation: cwDrift 9s  ease-in-out infinite 0.5s; }
+.cw-5 { font-size: clamp(1rem,3vw,4rem);  top: 15%; right: 15%; animation: cwDrift 11s ease-in-out infinite 3s; }
+
+@keyframes cwDrift {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  33%       { transform: translateY(-12px) translateX(6px); }
+  66%       { transform: translateY(8px)  translateX(-4px); }
+}
+
+/* Scene 3 is revealed with in-view class — word ghosts appear at full opacity only for in-view */
+.scene-3.in-view .cw { color: rgba(255,255,255,0.055); }
+
+.scatter-line {
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,169,110,0.18), transparent);
+  pointer-events: none;
+}
+
+.sl-1 { width: 40%; top: 22%; left: 0;   animation: lineSlide 7s ease-in-out infinite; }
+.sl-2 { width: 30%; bottom: 30%; right: 0; animation: lineSlide 9s ease-in-out infinite 2s reverse; }
+.sl-3 { width: 20%; top: 55%; left: 40%; animation: lineSlide 11s ease-in-out infinite 1s; }
+
+@keyframes lineSlide {
+  0%, 100% { transform: scaleX(1) translateX(0); opacity: 0.4; }
+  50%       { transform: scaleX(1.3) translateX(10px); opacity: 0.8; }
+}
+
+/* ═══════════════════════════════════════════════════
+   SECTION 4 — DEEP EMOTION
+═══════════════════════════════════════════════════ */
+.glow-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70vmin;
+  height: 70vmin;
+  background: radial-gradient(circle, rgba(201,125,135,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: deepGlow 5s ease-in-out infinite;
+}
+
+@keyframes deepGlow {
+  0%, 100% { opacity: 0.5; transform: translate(-50%,-50%) scale(1); }
+  50%       { opacity: 1;   transform: translate(-50%,-50%) scale(1.15); }
+}
+
+.heart-symbol {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  color: var(--blush);
+  display: block;
+  margin-bottom: 1.5rem;
+  animation: heartBeat 2.5s ease-in-out infinite;
+}
+
+@keyframes heartBeat {
+  0%, 100% { transform: scale(1); }
+  14%       { transform: scale(1.12); }
+  28%       { transform: scale(1); }
+  42%       { transform: scale(1.08); }
+  70%       { transform: scale(1); }
+}
+
+.scene-title-deep em { color: var(--blush); }
+
+/* ═══════════════════════════════════════════════════
+   SECTION 5 — BIRTHDAY WISH
+═══════════════════════════════════════════════════ */
+.burst-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,0.15);
+  pointer-events: none;
+  transition: none;
+}
+
+.ring-1 { width: 30vmin; height: 30vmin; }
+.ring-2 { width: 60vmin; height: 60vmin; }
+.ring-3 { width: 90vmin; height: 90vmin; }
+
+.scene-5.in-view .ring-1 { animation: ringExpand 2s 0.2s ease-out forwards; }
+.scene-5.in-view .ring-2 { animation: ringExpand 2s 0.6s ease-out forwards; }
+.scene-5.in-view .ring-3 { animation: ringExpand 2s 1.0s ease-out forwards; }
+
+@keyframes ringExpand {
+  0%   { transform: translate(-50%,-50%) scale(0); opacity: 0.8; }
+  100% { transform: translate(-50%,-50%) scale(1); opacity: 0; }
+}
+
+.candle-row {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.candle {
+  display: inline-block;
+  animation: candleFlicker 1.8s ease-in-out infinite;
+}
+
+.candle:nth-child(2) { animation-delay: 0.4s; }
+.candle:nth-child(3) { animation-delay: 0.8s; }
+
+@keyframes candleFlicker {
+  0%, 100% { transform: scaleY(1) translateY(0); filter: brightness(1); }
+  25%       { transform: scaleY(1.06) translateY(-2px); filter: brightness(1.15); }
+  75%       { transform: scaleY(0.96) translateY(1px); filter: brightness(0.95); }
+}
+
+.scene-title-wish em { color: var(--gold); }
+
+.closing-sig {
+  font-family: var(--ff-body);
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  color: var(--gold-pale);
+  margin-top: 1.5rem;
+  letter-spacing: 0.05em;
+}
+
+.confetti-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ═══════════════════════════════════════════════════
+   SCROLL REVEAL ANIMATIONS
+═══════════════════════════════════════════════════ */
+
+/* Base hidden states */
+.reveal-up,
+.reveal-left,
+.reveal-right,
+.reveal-scale {
+  opacity: 0;
+  transition:
+    opacity 1s cubic-bezier(0.22,1,0.36,1),
+    transform 1s cubic-bezier(0.22,1,0.36,1);
+}
+
+.reveal-up    { transform: translateY(40px); }
+.reveal-left  { transform: translateX(-50px); }
+.reveal-right { transform: translateX(50px); }
+.reveal-scale { transform: scale(0.88) translateY(30px); }
+
+/* Revealed state (added by IntersectionObserver) */
+.in-view .reveal-up,
+.in-view .reveal-left,
+.in-view .reveal-right,
+.in-view .reveal-scale {
+  opacity: 1;
+  transform: none;
+}
+
+/* Delay helpers */
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.3s; }
+.delay-3 { transition-delay: 0.55s; }
+.delay-4 { transition-delay: 0.75s; }
+
+/* ═══════════════════════════════════════════════════
+   GLOBAL KEYFRAMES
+═══════════════════════════════════════════════════ */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════
+   MOBILE RESPONSIVE
+═══════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .section-dots { right: 1rem; }
+  .dot          { width: 6px; height: 6px; }
+
+  .scene-number {
+    font-size: clamp(3rem, 15vw, 5rem);
+    bottom: 2rem;
+    left: 1.5rem;
+  }
+
+  .scene-content { padding: 1.5rem; }
+
+  .scene-title  { font-size: clamp(2rem, 8vw, 3.5rem); }
+  .scene-body   { font-size: 1rem; }
+
+  /* ── Portrait duo: single column on mobile ── */
+  .layout-duo {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  /* Reset rtl direction trick on mobile */
+  .layout-duo--reverse {
+    direction: ltr;
+  }
+
+  /* On mobile: images below text, side by side horizontally */
+  .duo-wrap {
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-end;
+    height: clamp(160px, 35vw, 220px);
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .portrait-card--top {
+    height: clamp(140px, 32vw, 200px);
+    width: clamp(90px, 18vw, 130px);
+    transform: rotate(-2deg) translateX(0);
+    margin-bottom: 0;
+  }
+
+  .portrait-card--btm {
+    height: clamp(120px, 28vw, 175px);
+    width: clamp(90px, 18vw, 130px);
+    transform: rotate(2.5deg) translateX(0);
+  }
+
+  /* Mobile reveal — fade up only, no side slide */
+  .portrait-card--top.reveal-portrait,
+  .portrait-card--btm.reveal-portrait {
+    transform: translateY(30px);
+  }
+
+  .in-view .portrait-card--top.reveal-portrait {
+    transform: rotate(-2deg);
+  }
+  .in-view .portrait-card--btm.reveal-portrait {
+    transform: rotate(2.5deg);
+  }
+
+  .chaos-words { display: none; } /* too cluttered on mobile */
+  .glow-pulse  { width: 90vmin; height: 90vmin; }
+}
+
+@media (max-width: 480px) {
+  .gate-title { font-size: clamp(2.5rem, 10vw, 3.5rem); }
+  .start-btn  { padding: 0.9rem 2rem; font-size: 0.7rem; }
+
+  .scene-body { font-size: 0.95rem; }
+}
+
+/* ─── Accessibility: respect reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

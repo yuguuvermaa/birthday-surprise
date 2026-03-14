@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday ✦</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Google Fonts: Cinzel (display) + Cormorant Garamond (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       GATE SCREEN — "Start the Experience" overlay
+  ═══════════════════════════════════════════ -->
+  <div id="gate" class="gate" aria-modal="true" role="dialog">
+    <canvas id="gateCanvas"></canvas>
+    <div class="gate-inner">
+      <p class="gate-eyebrow">a love letter in five scenes</p>
+      <h1 class="gate-title">Happiesttt<br/><em>Birthdayy<br/><em>cutiee💗</em></h1>
+      <p class="gate-sub">Turn up the volume & find a quiet moment.</p>
+      <button id="startBtn" class="start-btn">
+        <span class="btn-ring"></span>
+        <span class="btn-text">Begin the Story</span>
+      </button>
+    </div>
+    <!-- Soft radial glow -->
+    <div class="gate-glow"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       MUSIC PLAYER (hidden, controlled by JS)
+  ═══════════════════════════════════════════ -->
+  <div id="audioPlayers" aria-hidden="true" style="display:none;">
+    <audio id="audio1" loop preload="none" src="assets/music/song1.mp3"></audio>
+    <audio id="audio2" loop preload="none" src="assets/music/song2.mp3"></audio>
+    <audio id="audio3" loop preload="none" src="assets/music/song3.mp3"></audio>
+    <audio id="audio4" loop preload="none" src="assets/music/song4.mp3"></audio>
+    <audio id="audio5" loop preload="none" src="assets/music/song5.mp3"></audio>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       PROGRESS BAR
+  ═══════════════════════════════════════════ -->
+  <div id="progressBar" class="progress-bar" aria-hidden="true"></div>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION NAV DOTS
+  ═══════════════════════════════════════════ -->
+  <nav class="section-dots" aria-label="Section navigation">
+    <button class="dot active" data-target="0" aria-label="Section 1"></button>
+    <button class="dot" data-target="1" aria-label="Section 2"></button>
+    <button class="dot" data-target="2" aria-label="Section 3"></button>
+    <button class="dot" data-target="3" aria-label="Section 4"></button>
+    <button class="dot" data-target="4" aria-label="Section 5"></button>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════
+       MAIN SCROLL CONTAINER
+  ═══════════════════════════════════════════ -->
+  <main id="scrollContainer" class="scroll-container locked">
+
+    <!-- ─── SECTION 1 — "The Day Has Finally Arrived" ─── -->
+    <section class="scene scene-1" id="scene1" data-song="audio1" data-index="0">
+      <canvas class="particle-canvas" id="particleCanvas"></canvas>
+      <!-- Dark gradient background (no bg image — portraits carry the visuals) -->
+      <div class="scene-overlay s1-overlay"></div>
+
+      <div class="scene-content layout-duo">
+        <div class="scene-number" aria-hidden="true">01</div>
+
+        <!-- Text side -->
+        <div class="text-block">
+          <p class="eyebrow reveal-up delay-1">Today is the day</p>
+          <h2 class="scene-title reveal-up delay-2">
+            The day has<br/><em>finally arrived</em>
+          </h2>
+          <p class="scene-body reveal-up delay-3">
+            <!-- CUSTOMISE: Replace this with your opening message -->
+            every countdown led here. every wish whispered into birthday candles
+            was pointing at this exact moment. it's your your day gugluuu💗🌸.
+          </p>
+          <div class="divider reveal-up delay-4"></div>
+        </div>
+
+        <!-- Portrait duo -->
+        <div class="duo-wrap">
+          <div class="portrait-card portrait-card--top reveal-portrait delay-2">
+            <img src="assets/images/section1_img1.jpg" alt="Section 1 memory 1" />
+          </div>
+          <div class="portrait-card portrait-card--btm reveal-portrait delay-3">
+            <img src="assets/images/section1_img2.jpg" alt="Section 1 memory 2" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating orbs (CSS animated) -->
+      <div class="orb orb-a" aria-hidden="true"></div>
+      <div class="orb orb-b" aria-hidden="true"></div>
+      <div class="orb orb-c" aria-hidden="true"></div>
+    </section>
+
+    <!-- ─── SECTION 2 — "How It All Started" ─── -->
+    <section class="scene scene-2" id="scene2" data-song="audio2" data-index="1">
+      <div class="scene-overlay s2-overlay"></div>
+
+      <div class="scene-content layout-duo layout-duo--reverse">
+        <div class="scene-number" aria-hidden="true">02</div>
+
+        <!-- Text side -->
+        <div class="text-block reveal-right">
+          <p class="eyebrow">a memory</p>
+          <h2 class="scene-title">
+            How it all<br/><em>started</em>
+          </h2>
+          <p class="scene-body">
+            <!-- CUSTOMISE: Write the "how we met / how it all began" story here -->
+            i still remember the exact moment i told you everything🥹🥹 it was like a scene from a movie which i replay in my head very often. it was the day that i felt like the universe was winking at us, saying, "yup, this is it, you guys are soulmatess🥹."
+          </p>
+          <div class="divider"></div>
+        </div>
+
+        <!-- Portrait duo -->
+        <div class="duo-wrap">
+          <div class="portrait-card portrait-card--top reveal-portrait delay-2">
+            <img src="assets/images/section2_img1.jpg" alt="Section 2 memory 1" />
+          </div>
+          <div class="portrait-card portrait-card--btm reveal-portrait delay-3">
+            <img src="assets/images/section2_img2.jpg" alt="Section 2 memory 2" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SECTION 3 — "Our Chaos" ─── -->
+    <section class="scene scene-3" id="scene3" data-song="audio3" data-index="2">
+      <div class="scene-overlay s3-overlay"></div>
+
+      <!-- Staggered word burst (behind everything) -->
+      <div class="chaos-words" aria-hidden="true">
+        <span class="cw cw-1">laughter</span>
+        <span class="cw cw-2">3am</span>
+        <span class="cw cw-3">inside jokes</span>
+        <span class="cw cw-4">chaos</span>
+        <span class="cw cw-5">unhinged</span>
+      </div>
+
+      <div class="scene-content layout-duo">
+        <div class="scene-number" aria-hidden="true">03</div>
+
+        <!-- Text side -->
+        <div class="text-block reveal-up">
+          <p class="eyebrow">the best part</p>
+          <h2 class="scene-title scene-title-chaos">
+            Our<br/><em>chaos</em>
+          </h2>
+          <p class="scene-body">
+            <!-- CUSTOMISE: Write something playful about your shared chaos/adventures -->
+            all the fights we've had, all the times we got lost together🥺, all the ridiculous plans that somehow turned into unforgettable memories, that's the magic of us. it's not about being perfectt it's about being perfectlyy uss🥹💍, in all our messy, beautiful glory.
+          </p>
+          <div class="divider"></div>
+        </div>
+
+        <!-- Portrait duo -->
+        <div class="duo-wrap">
+          <div class="portrait-card portrait-card--top reveal-portrait delay-2">
+            <img src="assets/images/section3_img1.jpg" alt="Section 3 memory 1" />
+          </div>
+          <div class="portrait-card portrait-card--btm reveal-portrait delay-3">
+            <img src="assets/images/section3_img2.jpg" alt="Section 3 memory 2" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Animated scatter lines -->
+      <div class="scatter-line sl-1" aria-hidden="true"></div>
+      <div class="scatter-line sl-2" aria-hidden="true"></div>
+      <div class="scatter-line sl-3" aria-hidden="true"></div>
+    </section>
+
+    <!-- ─── SECTION 4 — "This Is What You Mean to Me" ─── -->
+    <section class="scene scene-4" id="scene4" data-song="audio4" data-index="3">
+      <div class="scene-overlay s4-overlay"></div>
+
+      <!-- Deep glow pulse -->
+      <div class="glow-pulse" aria-hidden="true"></div>
+
+      <div class="scene-content layout-duo layout-duo--reverse">
+        <div class="scene-number" aria-hidden="true">04</div>
+
+        <!-- Text side -->
+        <div class="text-block">
+          <div class="heart-symbol reveal-up delay-1" aria-hidden="true">♡</div>
+          <div class="reveal-up delay-2">
+            <p class="eyebrow">with everything I have</p>
+            <h2 class="scene-title scene-title-deep">
+              This is what you<br/><em>mean to me</em>
+            </h2>
+            <p class="scene-body scene-body-large">
+              <!-- CUSTOMISE: Your heartfelt message goes here. Make it specific & personal. -->
+              aap hi chahat ho, aap hi ibadat ho, aap hi aadat ho, aap hi shiddat ho🥹💗, you are my everythingg babyyyy💗. myyy wifeyyy💖🫶💍.
+            </p>
+            <div class="divider"></div>
+          </div>
+        </div>
+
+        <!-- Portrait duo -->
+        <div class="duo-wrap">
+          <div class="portrait-card portrait-card--top reveal-portrait delay-2">
+            <img src="assets/images/section4_img1.jpg" alt="Section 4 memory 1" />
+          </div>
+          <div class="portrait-card portrait-card--btm reveal-portrait delay-3">
+            <img src="assets/images/section4_img2.jpg" alt="Section 4 memory 2" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── SECTION 5 — "The Birthday Wish" ─── -->
+    <section class="scene scene-5" id="scene5" data-song="audio5" data-index="4">
+      <div class="scene-overlay s5-overlay"></div>
+
+      <!-- Radial burst on reveal -->
+      <div class="burst-ring ring-1" aria-hidden="true"></div>
+      <div class="burst-ring ring-2" aria-hidden="true"></div>
+      <div class="burst-ring ring-3" aria-hidden="true"></div>
+
+      <div class="scene-content layout-duo">
+        <div class="scene-number" aria-hidden="true">05</div>
+
+        <!-- Text side -->
+        <div class="text-block">
+          <div class="candle-row reveal-up delay-1" aria-hidden="true">
+            <span class="candle">🕯</span>
+            <span class="candle">🕯</span>
+            <span class="candle">🕯</span>
+          </div>
+
+          <div class="reveal-scale delay-2">
+            <p class="eyebrow">the grand finale</p>
+            <h2 class="scene-title scene-title-wish">
+              The<br/><em>Birthday Wish</em>
+            </h2>
+            <p class="scene-body scene-body-large">
+              <!-- CUSTOMISE: Your birthday wish / closing message -->
+              may this birthdayy bringg youu loadss of happinessss💗💗, you aree thee besttt🥹💖, you deservee everythingg babyyyy🌹🌸. god will bless youuu with so manyy blessingsss💗💗💗.
+            </p>
+            <div class="divider reveal-up delay-3"></div>
+            <p class="closing-sig reveal-up delay-4">
+              <!-- CUSTOMISE: Your name or closing signature -->
+              With all my love,<br/> guchupuchu💗
+            </p>
+          </div>
+        </div>
+
+        <!-- Portrait duo -->
+        <div class="duo-wrap">
+          <div class="portrait-card portrait-card--top reveal-portrait delay-2">
+            <img src="assets/images/section5_img1.jpg" alt="Section 5 memory 1" />
+          </div>
+          <div class="portrait-card portrait-card--btm reveal-portrait delay-3">
+            <img src="assets/images/section5_img2.jpg" alt="Section 5 memory 2" />
+          </div>
+        </div>
+
+        <!-- Confetti layer (JS driven) -->
+        <canvas id="confettiCanvas" class="confetti-canvas" aria-hidden="true"></canvas>
+      </div>
+    </section>
+
+  </main><!-- /scrollContainer -->
+
+  <script src="script.js"></script>
+</body>
+</html>
